@@ -23,3 +23,12 @@ CentOS:
  sudo yum install yum-plugin-copr
  sudo yum copr enable adrienverge/oauth2_proxy
  sudo yum install oauth2-proxy
+
+Build RPM locally
+-----------------
+
+.. code:: shell
+
+ rpmbuild -bs oauth2-proxy.spec
+ # enable config_opts['rpmbuild_networking'] in /etc/mock/site-defaults.cfg
+ mock -r epel-7-x86_64 rebuild ~/rpmbuild/SRPMS/oauth2-proxy-2.*.src.rpm

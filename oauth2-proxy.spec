@@ -3,12 +3,12 @@
 %define debug_package %{nil}
 
 Name:           oauth2-proxy
-Version:        2.1
+Version:        2.2
 Release:        1%{?dist}
 Summary:        A reverse proxy that provides authentication with Google, Github or other provider
 License:        MIT
 URL:            https://github.com/bitly/oauth2_proxy
-Source0:        https://github.com/bitly/oauth2_proxy/archive/v2.1.tar.gz
+Source0:        oauth2_proxy-v%{version}.tar.gz
 
 BuildRequires: git
 BuildRequires: golang
@@ -63,5 +63,8 @@ getent passwd www-data >/dev/null || \
 %{_unitdir}/oauth2_proxy.service
 
 %changelog
+* Wed Sep 6 2017 Adrien Vergé - 2.2-1
+- Update to latest upstream version
+
 * Mon Feb 6 2017 Adrien Vergé - 2.1-1
 - Initial RPM release
