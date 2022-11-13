@@ -1,17 +1,17 @@
-# Copyright 2017 Adrien Vergé
+# Copyright 2017-2022 Adrien Vergé
 
 %define debug_package %{nil}
 
 Name:           oauth2-proxy
-Version:        2.2
+Version:        7.4.0
 Release:        1%{?dist}
 Summary:        A reverse proxy that provides authentication with Google, Github or other provider
 License:        MIT
-URL:            https://github.com/bitly/oauth2_proxy
-Source0:        oauth2_proxy-v%{version}.tar.gz
+URL:            https://github.com/oauth2-proxy/oauth2-proxy
+Source0:        oauth2-proxy-v7.4.0.linux-amd64.tar.gz
+Source1:        oauth2-proxy.cfg.example
+Source2:        oauth2-proxy.service.example
 
-BuildRequires: git
-BuildRequires: golang
 BuildRequires: systemd
 
 Requires(pre): shadow-utils
@@ -24,22 +24,16 @@ Providers (Google, GitHub, and others) to validate accounts by email, domain or
 group.
 
 %prep
-%setup -q -n oauth2_proxy-%{version}
+%setup -q -n oauth2-proxy-v%{version}.linux-amd64
 
 %build
-export GOPATH=$(pwd)/_build
-export GOBIN=$(pwd)/_build/bin
-go get .
-go build -o oauth2_proxy .
-sed -i 's|/usr/local/bin/oauth2_proxy|/usr/bin/oauth2_proxy|g' \
-  contrib/oauth2_proxy.service.example
+echo "For simplicity I use the official pre-built binary from the GitHub repo"
+sed -i 's|/usr/local/bin/oauth2-proxy|/usr/bin/oauth2-proxy|g' %{SOURCE2}
 
 %install
-install -D -p -m 755 oauth2_proxy %{buildroot}%{_bindir}/oauth2_proxy
-install -D -p -m 644 contrib/oauth2_proxy.cfg.example \
-  %{buildroot}%{_sysconfdir}/oauth2_proxy.cfg
-install -D -p -m 644 contrib/oauth2_proxy.service.example \
-  %{buildroot}%{_unitdir}/oauth2_proxy.service
+install -D -p -m 755 oauth2-proxy %{buildroot}%{_bindir}/oauth2-proxy
+install -D -p -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/oauth2-proxy.cfg
+install -D -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/oauth2-proxy.service
 
 %pre
 getent group www-data >/dev/null || groupadd -r www-data
@@ -47,22 +41,24 @@ getent passwd www-data >/dev/null || \
   useradd -r -g www-data -s /sbin/nologin www-data
 
 %post
-%systemd_post oauth2_proxy.service
+%systemd_post oauth2-proxy.service
 
 %preun
-%systemd_preun oauth2_proxy.service
+%systemd_preun oauth2-proxy.service
 
 %postun
-%systemd_postun_with_restart oauth2_proxy.service
+%systemd_postun_with_restart oauth2-proxy.service
 
 %files
 %defattr(-,root,root,-)
-%doc LICENSE README.md
-%{_bindir}/oauth2_proxy
-%config(noreplace) %{_sysconfdir}/oauth2_proxy.cfg
-%{_unitdir}/oauth2_proxy.service
+%{_bindir}/oauth2-proxy
+%config(noreplace) %{_sysconfdir}/oauth2-proxy.cfg
+%{_unitdir}/oauth2-proxy.service
 
 %changelog
+* Mon Nov 14 2022 Adrien Vergé - 7.4.0-1
+- Update to latest upstream version
+
 * Wed Sep 6 2017 Adrien Vergé - 2.2-1
 - Update to latest upstream version
 
