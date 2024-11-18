@@ -29,6 +29,21 @@ group.
 %build
 echo "For simplicity I use the official pre-built binary from the GitHub repo"
 
+# Avoid the second screen "By continuing, Google will share your name…" every
+# time. I found this solution after reading https://stackoverflow.com/a/48771341
+# and https://github.com/oauth2-proxy/oauth2-proxy/pull/444
+patch %{SOURCE2} <<'PATCH'
+@@ -11,7 +11,7 @@ Group=oauth2-proxy
+ Restart=on-failure
+ RestartSec=30
+ WorkingDirectory=/etc/oauth2-proxy
+-ExecStart=/usr/bin/oauth2-proxy --config=/etc/oauth2-proxy/oauth2-proxy.cfg
++ExecStart=/usr/bin/oauth2-proxy --config=/etc/oauth2-proxy/oauth2-proxy.cfg --prompt=select_account
+ ExecReload=/bin/kill -HUP $MAINPID
+ LimitNOFILE=65535
+ NoNewPrivileges=true
+PATCH
+
 %install
 install -D -p -m 755 oauth2-proxy %{buildroot}%{_bindir}/oauth2-proxy
 install -D -p -m 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/oauth2-proxy.cfg
